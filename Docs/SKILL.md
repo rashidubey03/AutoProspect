@@ -10,6 +10,8 @@ These instructions must be followed while implementing the AutoProspect project.
 - Whenever a new feature is added, create a feature branch in addition to `main`.
 - Branch names must be only the feature name; do not use names like `feature/phase-x`.
 - After completing each phase, push both the feature branch and `main` to the repository.
+- For every phase, add tests to verify the phase and document how to run them in `Docs/phase_tests.md`.
+- Store all automated tests in the `tests/` folder.
 - Whenever the user gives another standing instruction, update this file.
 - Use as less tokens as possible
 

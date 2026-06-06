@@ -57,3 +57,18 @@
 - Added `PipelineResult` with summary counters.
 - Updated `main.py` to validate the domain and run the orchestrator.
 - Updated project instructions to require pushing both the feature branch and `main`.
+
+## Test Setup Instruction Update
+
+### User Instructions
+
+- From now on, provide tests to check each phase.
+- Store phase test instructions in a separate Markdown file in `Docs`.
+- Create a `tests/` folder to store all automated tests.
+
+### Implementation Notes
+
+- Added `Docs/phase_tests.md`.
+- Added `pytest` to `requirements.txt`.
+- Added automated tests for Phase 1 and Phase 2.
+- Updated `Docs/SKILL.md` with the new standing test instructions.
