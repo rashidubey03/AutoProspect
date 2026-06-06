@@ -2,6 +2,7 @@ import argparse
 import json
 import sys
 
+from orchestrator import Pipeline
 from utils.logger import configure_logger
 from utils.validators import DomainValidationError, normalize_domain
 
@@ -24,7 +25,8 @@ def main() -> int:
     except DomainValidationError as error:
         parser.error(str(error))
 
-    print(json.dumps({"domain": domain}, indent=2))
+    result = Pipeline().run(domain)
+    print(json.dumps(result.to_dict(), indent=2))
     return 0
 
 

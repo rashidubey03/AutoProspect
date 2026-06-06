@@ -33,3 +33,27 @@
 - Added shared data models.
 - Added utility modules for logging, retry behavior, validation, and deduplication.
 - Added `.env.example` and `.gitignore` to prevent credential commits.
+
+## Phase 2: Pipeline Orchestrator
+
+### User Instructions
+
+- Push the feature branch as well as `main`.
+- Branch names should be only the feature name.
+- `main` should contain the final phase result.
+
+### PRD Context
+
+- The pipeline must coordinate domain input, similar company discovery, contact discovery, email resolution, email generation, confirmation, and sending.
+- Provider-specific logic must stay outside `main.py`.
+- Logs must show pipeline progress and summary counts.
+- Later phases will replace placeholder services with Apollo.io, Prospeo, Eazyreach, email template generation, confirmation, and Brevo implementations.
+
+### Implementation Notes
+
+- Created `orchestrator/pipeline.py`.
+- Added `Pipeline` as the single orchestration path.
+- Added injectable placeholder services for all future provider stages.
+- Added `PipelineResult` with summary counters.
+- Updated `main.py` to validate the domain and run the orchestrator.
+- Updated project instructions to require pushing both the feature branch and `main`.
