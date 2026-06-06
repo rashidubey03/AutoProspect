@@ -72,3 +72,27 @@
 - Added `pytest` to `requirements.txt`.
 - Added automated tests for Phase 1 and Phase 2.
 - Updated `Docs/SKILL.md` with the new standing test instructions.
+
+## Run Instructions Update
+
+### User Instructions
+
+- Explain how to run whatever has been implemented so far.
+- Include those run instructions in `Docs/phase_tests.md`.
+- Also record the run-instruction context in this file.
+
+### Current Runtime Context
+
+- The project is currently implemented through Phase 2.
+- Running `python main.py openai.com` validates the domain and executes the pipeline orchestrator.
+- Provider stages are placeholders until later phases.
+- The current CLI output is a JSON summary with zero companies, contacts, verified emails, prepared emails, sent emails, and failed emails.
+
+### Commands
+
+```bash
+python -m pip install -r requirements.txt
+python main.py openai.com
+python main.py https://openai.com/
+python -m pytest
+```
