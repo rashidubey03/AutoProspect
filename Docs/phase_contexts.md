@@ -153,3 +153,4 @@ python -m pytest
 - Stopped retrying Apollo `401` and `403` responses.
 - Updated the CLI to print a clean error message instead of a traceback.
 - Added a regression test for non-retryable Apollo permission errors.
+- Catch `ApolloError` in `main.py` and log that Apollo Organization Search is unavailable due to plan restrictions using the configured logger.

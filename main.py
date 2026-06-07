@@ -1,5 +1,6 @@
 import argparse
 import json
+import logging
 import sys
 
 from orchestrator import Pipeline
@@ -8,6 +9,8 @@ from services import ApolloService
 from services.apollo_service import ApolloError
 from utils.logger import configure_logger
 from utils.validators import DomainValidationError, normalize_domain
+
+logger = logging.getLogger(__name__)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -34,11 +37,15 @@ def main() -> int:
     )
     try:
         result = Pipeline(company_discovery=company_discovery).run(domain)
-    except ApolloError as error:
-        print(f"[ERROR] {error}", file=sys.stderr)
+    except ApolloError:
+        logger.error(
+            "Apollo Organization Search unavailable. "
+            "Current Apollo plan does not provide access."
+        )
         return 1
     print(json.dumps(result.to_dict(), indent=2))
     return 0
+
 
 
 if __name__ == "__main__":
