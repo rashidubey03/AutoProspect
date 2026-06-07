@@ -5,7 +5,7 @@ import sys
 
 from orchestrator import Pipeline
 from config import AppConfig
-from services import ApolloService
+from services import ApolloService, ProspeoService
 from services.apollo_service import ApolloError
 from utils.logger import configure_logger
 from utils.validators import DomainValidationError, normalize_domain
@@ -35,8 +35,14 @@ def main() -> int:
     company_discovery = (
         ApolloService(config.apollo_api_key) if config.apollo_api_key else None
     )
+    contact_discovery = (
+        ProspeoService(config.prospeo_api_key) if config.prospeo_api_key else None
+    )
     try:
-        result = Pipeline(company_discovery=company_discovery).run(domain)
+        result = Pipeline(
+            company_discovery=company_discovery,
+            contact_discovery=contact_discovery,
+        ).run(domain)
     except ApolloError:
         logger.error(
             "Apollo Organization Search unavailable. "

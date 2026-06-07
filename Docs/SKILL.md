@@ -17,4 +17,4 @@ These instructions must be followed while implementing the AutoProspect project.
 
 ## Current Phase
 
-- Phase 3: Apollo.io Similar Company Discovery
+- Phase 4: Prospeo Decision Maker and Email Discovery

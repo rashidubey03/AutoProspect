@@ -154,3 +154,23 @@ python -m pytest
 - Updated the CLI to print a clean error message instead of a traceback.
 - Added a regression test for non-retryable Apollo permission errors.
 - Catch `ApolloError` in `main.py` and log that Apollo Organization Search is unavailable due to plan restrictions using the configured logger.
+
+## Phase 4: Prospeo Decision Maker and Email Discovery
+
+### PRD Context
+
+- Query Prospeo by company domain.
+- Filter contacts by target roles: CEO, CTO, Founder, Co-Founder, VP Engineering, VP Product, VP Sales, Head of Growth.
+- Skip contacts missing LinkedIn URLs, empty email responses, or unverified emails.
+- Retry failed company lookups up to 3 times; skip and proceed to the next company if lookup fails after retries.
+- Return a list of `Contact` objects containing names, titles, LinkedIn URLs, verified emails, and verification status.
+
+### Implementation Notes
+
+- Created `services/prospeo_service.py` implementing `ProspeoService`.
+- Added regex matching with word boundaries to filter target roles case-insensitively.
+- Deduplicated contacts based on `person_id` or `linkedin_url` or `full_name`.
+- Added `POST /search-person` to find candidates, and `POST /enrich-person` to retrieve verified emails.
+- Integrated `ProspeoService` into the `Pipeline` (via `main.py` when `PROSPEO_API_KEY` is present).
+- Added mocked integration and unit tests under `tests/test_phase_4_prospeo.py`.
+

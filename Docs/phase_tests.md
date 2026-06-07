@@ -126,3 +126,28 @@ If Apollo returns `403`, the API key works but does not have access to the Apoll
 ### Test File
 
 - `tests/test_phase_3_apollo.py`
+
+## Phase 4: Prospeo Decision Maker and Email Discovery
+
+### Manual Check
+
+Add `PROSPEO_API_KEY` and `APOLLO_API_KEY` to `.env`, then run:
+
+```bash
+python main.py openai.com
+```
+
+Expected result: the CLI executes both Apollo and Prospeo. Prospeo queries the discovered company domains, filters decision makers using the role criteria, enriches matching contacts, and retains only verified emails. 
+
+### Covers
+
+- Prospeo `/search-person` request formatting and response parsing.
+- Prospeo `/enrich-person` email enrichment and status validation (filtering for `VERIFIED` emails).
+- Target role title filtering using regex boundaries.
+- Contact deduplication and validation.
+- Transient API retry behavior and auth/permission error handling.
+
+### Test File
+
+- `tests/test_phase_4_prospeo.py`
+
