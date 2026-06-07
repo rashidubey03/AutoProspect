@@ -20,6 +20,14 @@ class ApolloRateLimitError(ApolloError):
     pass
 
 
+class ApolloAuthError(ApolloError):
+    pass
+
+
+class ApolloPermissionError(ApolloError):
+    pass
+
+
 @dataclass(frozen=True)
 class ApolloCompanyProfile:
     domain: str
@@ -131,11 +139,21 @@ class ApolloService:
                 if response.status_code == 429:
                     logger.warning("Apollo rate limit hit for %s", path)
                     raise ApolloRateLimitError("Apollo rate limit reached.")
+                if response.status_code == 401:
+                    raise ApolloAuthError(
+                        "Apollo API key was rejected. Check APOLLO_API_KEY in .env."
+                    )
+                if response.status_code == 403:
+                    raise ApolloPermissionError(
+                        "Apollo returned 403 for this endpoint. Your API key or Apollo plan likely lacks access to Organization Search."
+                    )
                 if response.status_code >= 500:
                     raise ApolloError(f"Apollo transient error: {response.status_code}")
                 if response.status_code >= 400:
                     raise ApolloError(f"Apollo API error: {response.status_code}")
                 return response
+            except (ApolloAuthError, ApolloPermissionError):
+                raise
             except (requests.RequestException, ApolloRateLimitError, ApolloError) as error:
                 last_error = error
                 if attempt == self.max_retries:

@@ -1,6 +1,6 @@
 import pytest
 
-from services.apollo_service import ApolloError, ApolloService
+from services.apollo_service import ApolloError, ApolloPermissionError, ApolloService
 
 
 class FakeResponse:
@@ -122,3 +122,14 @@ def test_apollo_service_retries_rate_limits() -> None:
         service.find_similar_companies("openai.com")
 
     assert len(session.requests) == 3
+
+
+def test_apollo_service_does_not_retry_permission_errors() -> None:
+    session = FakeSession([FakeResponse(403, {})])
+
+    service = ApolloService("test-key", session=session, backoff_seconds=0)
+
+    with pytest.raises(ApolloPermissionError, match="lacks access to Organization Search"):
+        service.find_similar_companies("openai.com")
+
+    assert len(session.requests) == 1

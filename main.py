@@ -5,6 +5,7 @@ import sys
 from orchestrator import Pipeline
 from config import AppConfig
 from services import ApolloService
+from services.apollo_service import ApolloError
 from utils.logger import configure_logger
 from utils.validators import DomainValidationError, normalize_domain
 
@@ -31,7 +32,11 @@ def main() -> int:
     company_discovery = (
         ApolloService(config.apollo_api_key) if config.apollo_api_key else None
     )
-    result = Pipeline(company_discovery=company_discovery).run(domain)
+    try:
+        result = Pipeline(company_discovery=company_discovery).run(domain)
+    except ApolloError as error:
+        print(f"[ERROR] {error}", file=sys.stderr)
+        return 1
     print(json.dumps(result.to_dict(), indent=2))
     return 0
 

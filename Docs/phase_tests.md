@@ -112,6 +112,8 @@ python main.py openai.com
 
 Expected result: the Apollo stage attempts company metadata enrichment and similar-company search, then the remaining placeholder stages return zero contact/send counts until later phases are implemented.
 
+If Apollo returns `403`, the API key works but does not have access to the Apollo Organization Search endpoint or the current Apollo plan does not include it. Enable access to Organization Search for the API key or use a plan/key that supports it.
+
 ### Covers
 
 - Apollo organization enrichment response parsing.
@@ -119,6 +121,7 @@ Expected result: the Apollo stage attempts company metadata enrichment and simil
 - Search filters derived from metadata.
 - Similarity ranking and duplicate filtering.
 - Rate-limit retry behavior.
+- Clean handling for Apollo permission errors.
 
 ### Test File
 

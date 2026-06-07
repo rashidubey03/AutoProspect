@@ -135,3 +135,21 @@ python -m pytest
 - Added similarity scoring and duplicate-domain filtering.
 - Wired `main.py` to use `ApolloService` when `APOLLO_API_KEY` is available.
 - Added mocked Phase 3 tests without making live Apollo API calls.
+
+## Apollo Permission Error Handling Update
+
+### User Context
+
+- Running `python main.py https://openai.com/` loaded Apollo metadata, then Apollo returned `403` from Organization Search.
+
+### Diagnosis
+
+- The API key is valid enough to call enrichment, but the key or Apollo plan likely lacks access to the Organization Search endpoint.
+- Apollo `403` is not a transient error, so retrying it three times is not useful.
+
+### Implementation Notes
+
+- Added explicit Apollo auth and permission error types.
+- Stopped retrying Apollo `401` and `403` responses.
+- Updated the CLI to print a clean error message instead of a traceback.
+- Added a regression test for non-retryable Apollo permission errors.
