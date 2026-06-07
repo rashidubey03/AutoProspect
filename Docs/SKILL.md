@@ -17,4 +17,4 @@ These instructions must be followed while implementing the AutoProspect project.
 
 ## Current Phase
 
-- Phase 2: Pipeline Orchestrator
+- Phase 3: Apollo.io Similar Company Discovery

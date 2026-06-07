@@ -111,3 +111,27 @@ python -m pytest
 - Updated `Contact` to include `email_verified`.
 - Updated the pipeline to filter Prospeo contacts by LinkedIn URL, email, and email verification status.
 - Updated tests and docs to reflect Prospeo as the contact and email source.
+
+## Phase 3: Apollo.io Similar Company Discovery
+
+### User Instructions
+
+- Continue with the next phase.
+- Keep pushing both feature branches and `main`.
+- Keep tests and phase docs updated.
+
+### PRD Context
+
+- Apollo.io retrieves metadata for the input domain.
+- Apollo.io searches for companies with similar industry, employee count, keywords, technologies, and location.
+- Results must be paginated, deduplicated, ranked by similarity, and logged.
+- API failures and rate limits should be retried with backoff.
+
+### Implementation Notes
+
+- Created `services/apollo_service.py`.
+- Added Apollo organization enrichment and organization search calls.
+- Added metadata extraction for industry, employee count, keywords, technologies, and location.
+- Added similarity scoring and duplicate-domain filtering.
+- Wired `main.py` to use `ApolloService` when `APOLLO_API_KEY` is available.
+- Added mocked Phase 3 tests without making live Apollo API calls.

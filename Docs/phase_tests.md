@@ -24,7 +24,7 @@ Current expected behavior:
 
 - The domain is normalized and validated.
 - The Phase 2 orchestrator runs.
-- Apollo, Prospeo, email generation, confirmation, and Brevo are still placeholder stages.
+- Apollo runs when `APOLLO_API_KEY` is present; Prospeo, email generation, confirmation, and Brevo are still placeholder stages.
 - The command returns a JSON pipeline summary with zero discovered/sent counts until later phases add real integrations.
 
 Example output:
@@ -53,6 +53,7 @@ Run tests for a specific phase:
 ```bash
 python -m pytest tests/test_phase_1_foundation.py
 python -m pytest tests/test_phase_2_pipeline.py
+python -m pytest tests/test_phase_3_apollo.py
 ```
 
 ## Phase 1: Project Foundation
@@ -98,3 +99,27 @@ Expected result: the pipeline runs through the placeholder orchestrator and retu
 ### Test File
 
 - `tests/test_phase_2_pipeline.py`
+
+## Phase 3: Apollo.io Similar Company Discovery
+
+### Manual Check
+
+Add `APOLLO_API_KEY` to `.env`, then run:
+
+```bash
+python main.py openai.com
+```
+
+Expected result: the Apollo stage attempts company metadata enrichment and similar-company search, then the remaining placeholder stages return zero contact/send counts until later phases are implemented.
+
+### Covers
+
+- Apollo organization enrichment response parsing.
+- Apollo organization search response parsing.
+- Search filters derived from metadata.
+- Similarity ranking and duplicate filtering.
+- Rate-limit retry behavior.
+
+### Test File
+
+- `tests/test_phase_3_apollo.py`
