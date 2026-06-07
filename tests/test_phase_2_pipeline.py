@@ -21,14 +21,10 @@ class FakeContactDiscovery:
                 name=f"Lead at {company.domain}",
                 title="CTO",
                 linkedin_url=f"https://linkedin.com/in/{company.domain}",
+                email="lead@example.com",
+                email_verified=True,
             )
         ]
-
-
-class FakeEmailResolution:
-    def resolve_email(self, contact: Contact) -> Contact | None:
-        contact.email = f"{contact.name.split()[0].lower()}@example.com"
-        return contact
 
 
 class FakeEmailGenerator:
@@ -57,7 +53,38 @@ class ContactDiscoveryWithMissingLinkedIn:
     def find_decision_makers(self, company: Company) -> list[Contact]:
         return [
             Contact(name="No LinkedIn", title="CEO", linkedin_url=""),
-            Contact(name="Has LinkedIn", title="CTO", linkedin_url="https://linkedin.com/in/has"),
+            Contact(
+                name="Has LinkedIn",
+                title="CTO",
+                linkedin_url="https://linkedin.com/in/has",
+                email="has@example.com",
+                email_verified=True,
+            ),
+        ]
+
+
+class ContactDiscoveryWithEmailSkips:
+    def find_decision_makers(self, company: Company) -> list[Contact]:
+        return [
+            Contact(
+                name="Missing Email",
+                title="CEO",
+                linkedin_url="https://linkedin.com/in/missing",
+            ),
+            Contact(
+                name="Unverified Email",
+                title="CTO",
+                linkedin_url="https://linkedin.com/in/unverified",
+                email="unverified@example.com",
+                email_verified=False,
+            ),
+            Contact(
+                name="Verified Email",
+                title="Founder",
+                linkedin_url="https://linkedin.com/in/verified",
+                email="verified@example.com",
+                email_verified=True,
+            ),
         ]
 
 
@@ -65,7 +92,6 @@ def test_pipeline_collects_summary_counts_with_injected_services() -> None:
     result = Pipeline(
         company_discovery=FakeCompanyDiscovery(),
         contact_discovery=FakeContactDiscovery(),
-        email_resolution=FakeEmailResolution(),
         email_generator=FakeEmailGenerator(),
         confirmation=ApproveSending(),
         email_sender=FakeEmailSender(),
@@ -94,7 +120,6 @@ def test_pipeline_skips_contacts_without_linkedin() -> None:
     result = Pipeline(
         company_discovery=lambda_domain_company_discovery(),
         contact_discovery=ContactDiscoveryWithMissingLinkedIn(),
-        email_resolution=FakeEmailResolution(),
         email_generator=FakeEmailGenerator(),
         confirmation=ApproveSending(),
         email_sender=FakeEmailSender(),
@@ -102,6 +127,20 @@ def test_pipeline_skips_contacts_without_linkedin() -> None:
 
     assert result.contacts_found == 2
     assert result.verified_emails == 1
+
+
+def test_pipeline_skips_missing_and_unverified_emails() -> None:
+    result = Pipeline(
+        company_discovery=lambda_domain_company_discovery(),
+        contact_discovery=ContactDiscoveryWithEmailSkips(),
+        email_generator=FakeEmailGenerator(),
+        confirmation=ApproveSending(),
+        email_sender=FakeEmailSender(),
+    ).run("openai.com")
+
+    assert result.contacts_found == 3
+    assert result.verified_emails == 1
+    assert result.failed_recipients == ("verified@example.com",)
 
 
 class lambda_domain_company_discovery:

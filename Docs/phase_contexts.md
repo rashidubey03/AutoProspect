@@ -19,11 +19,10 @@
 - Credentials must come from environment variables:
   - `APOLLO_API_KEY`
   - `PROSPEO_API_KEY`
-  - `EAZYREACH_API_KEY`
   - `BREVO_API_KEY`
 - Providers must be isolated behind service classes in later phases.
 - The `Company` model includes `domain`, optional `name`, and optional `industry`.
-- The `Contact` model includes `name`, `title`, `linkedin_url`, and optional `email`.
+- The `Contact` model includes `name`, `title`, `linkedin_url`, optional `email`, and email verification status.
 - The `EmailPayload` model includes `recipient`, `subject`, and `body`.
 
 ### Implementation Notes
@@ -44,10 +43,10 @@
 
 ### PRD Context
 
-- The pipeline must coordinate domain input, similar company discovery, contact discovery, email resolution, email generation, confirmation, and sending.
+- The pipeline must coordinate domain input, similar company discovery, contact discovery, verified contact filtering, email generation, confirmation, and sending.
 - Provider-specific logic must stay outside `main.py`.
 - Logs must show pipeline progress and summary counts.
-- Later phases will replace placeholder services with Apollo.io, Prospeo, Eazyreach, email template generation, confirmation, and Brevo implementations.
+- Later phases will replace placeholder services with Apollo.io, Prospeo, email template generation, confirmation, and Brevo implementations.
 
 ### Implementation Notes
 
@@ -96,3 +95,19 @@ python main.py openai.com
 python main.py https://openai.com/
 python -m pytest
 ```
+
+## Prospeo Email Discovery Update
+
+### User Instructions
+
+- Use Prospeo itself to find people, LinkedIn URLs, and email IDs.
+- Remove Eazyreach from the workflow.
+- Update all relevant files.
+
+### Implementation Notes
+
+- Removed `EAZYREACH_API_KEY` from config and env docs.
+- Removed the Eazyreach placeholder from the pipeline.
+- Updated `Contact` to include `email_verified`.
+- Updated the pipeline to filter Prospeo contacts by LinkedIn URL, email, and email verification status.
+- Updated tests and docs to reflect Prospeo as the contact and email source.

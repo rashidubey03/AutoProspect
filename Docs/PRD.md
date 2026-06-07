@@ -7,9 +7,8 @@ Build a command-line application that automates the complete B2B outbound prospe
 The system accepts a single company domain as input and automatically:
 
 1. Finds similar companies using Apollo.io
-2. Finds decision makers using Prospeo
-3. Finds verified work emails using Eazyreach
-4. Sends personalized outreach emails using Brevo
+2. Finds decision makers, LinkedIn URLs, and verified work emails using Prospeo
+3. Sends personalized outreach emails using Brevo
 
 The entire workflow must execute automatically with no manual intervention between stages.
 
@@ -36,7 +35,7 @@ Prospeo
     ↓
 Decision Makers
     ↓
-Eazyreach
+Decision Makers + Verified Emails
     ↓
 Verified Emails
     ↓
@@ -131,7 +130,7 @@ Apollo.io API
 
 ---
 
-## FR-3 Decision Maker Discovery
+## FR-3 Decision Maker and Email Discovery
 
 ### Service
 
@@ -152,7 +151,9 @@ Prospeo API
   {
     "name": "John Doe",
     "title": "CTO",
-    "linkedin_url": "https://linkedin.com/in/johndoe"
+      "linkedin_url": "https://linkedin.com/in/johndoe",
+      "email": "john@anthropic.com",
+      "email_verified": true
   }
 ]
 ```
@@ -175,41 +176,13 @@ Prioritize:
 * Filter irrelevant titles
 * Remove duplicate contacts
 * Store LinkedIn URLs
-
----
-
-## FR-4 Email Resolution
-
-### Service
-
-Eazyreach API
-
-### Input
-
-```json
-{
-  "linkedin_url": "https://linkedin.com/in/johndoe"
-}
-```
-
-### Output
-
-```json
-{
-  "email": "john@anthropic.com",
-  "verified": true
-}
-```
-
-### Requirements
-
+* Store verified email addresses
 * Skip unverified emails
-* Skip empty responses
-* Log failures
+* Skip empty email responses
 
 ---
 
-## FR-5 Email Personalization
+## FR-4 Email Personalization
 
 ### Description
 
@@ -248,7 +221,7 @@ Rashi
 
 ---
 
-## FR-6 Confirmation Checkpoint
+## FR-5 Confirmation Checkpoint
 
 ### Description
 
@@ -273,7 +246,7 @@ Proceed with sending emails? (Y/N)
 
 ---
 
-## FR-7 Email Sending
+## FR-6 Email Sending
 
 ### Service
 
@@ -350,7 +323,6 @@ Store credentials in:
 ```env
 APOLLO_API_KEY=
 PROSPEO_API_KEY=
-EAZYREACH_API_KEY=
 BREVO_API_KEY=
 ```
 
@@ -376,7 +348,6 @@ Good:
 ```python
 ApolloService
 ProspeoService
-EazyreachService
 BrevoService
 ```
 
@@ -393,8 +364,6 @@ Pipeline Orchestrator
     ├── Apollo Service
     │
     ├── Prospeo Service
-    │
-    ├── Eazyreach Service
     │
     ├── Email Generator
     │
@@ -424,6 +393,7 @@ class Contact:
     title: str
     linkedin_url: str
     email: str | None
+    email_verified: bool = False
 ```
 
 ## EmailPayload
@@ -451,7 +421,6 @@ outreach-pipeline/
 ├── services/
 │   ├── apollo_service.py
 │   ├── prospeo_service.py
-│   ├── eazyreach_service.py
 │   └── brevo_service.py
 │
 ├── orchestrator/
@@ -545,7 +514,7 @@ A solution is considered successful if:
 * No manual copy-pasting is required
 * Similar companies are discovered through Apollo.io
 * Decision makers are found
-* Verified emails are retrieved
+* Verified emails are retrieved through Prospeo
 * Personalized emails are generated
 * Emails are sent through Brevo
 * Confirmation step exists before sending

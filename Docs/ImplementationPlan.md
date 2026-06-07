@@ -9,11 +9,10 @@ Automated Outreach Pipeline
 Build a Python command-line application that accepts a company domain and runs the complete outbound workflow:
 
 1. Discover similar companies through Apollo.io.
-2. Find decision makers through Prospeo.
-3. Resolve and verify work emails through Eazyreach.
-4. Generate personalized outreach emails.
-5. Ask for final confirmation.
-6. Send emails through Brevo.
+2. Find decision makers, LinkedIn URLs, and verified work emails through Prospeo.
+3. Generate personalized outreach emails.
+4. Ask for final confirmation.
+5. Send emails through Brevo.
 
 ---
 
@@ -31,7 +30,6 @@ Create the base application structure, configuration layer, shared models, and l
 - Add `.env.example` with required variables.
   - `APOLLO_API_KEY`
   - `PROSPEO_API_KEY`
-  - `EAZYREACH_API_KEY`
   - `BREVO_API_KEY`
 - Add `requirements.txt`.
 - Create data models:
@@ -80,7 +78,7 @@ Build the central workflow controller that coordinates all stages without embedd
   - input domain
   - similar company discovery
   - contact discovery
-  - email resolution
+  - verified contact filtering
   - email generation
   - confirmation
   - sending
@@ -88,7 +86,7 @@ Build the central workflow controller that coordinates all stages without embedd
 - Add summary counters:
   - companies found
   - contacts found
-  - verified emails found
+  - verified emails found from Prospeo contact results
   - emails sent
   - emails failed
 
@@ -147,11 +145,11 @@ Implement similar company discovery using Apollo.io.
 
 ---
 
-## Phase 4: Prospeo Decision Maker Discovery
+## Phase 4: Prospeo Decision Maker and Email Discovery
 
 ### Goal
 
-Find relevant decision makers for each discovered company.
+Find relevant decision makers, LinkedIn URLs, and verified work emails for each discovered company.
 
 ### Scope
 
@@ -168,45 +166,45 @@ Find relevant decision makers for each discovered company.
   - Head of Growth
 - Remove duplicate contacts.
 - Skip contacts without LinkedIn URLs.
+- Skip contacts without verified emails.
 - Retry failed company lookups up to 3 times.
 - Continue to the next company if one lookup fails.
 
 ### Deliverables
 
-- `ProspeoService` returning a list of `Contact` objects.
+- `ProspeoService` returning a list of `Contact` objects with LinkedIn URLs and verified emails.
 
 ### Acceptance Criteria
 
 - Irrelevant titles are filtered out.
 - Contacts without LinkedIn URLs are skipped.
+- Contacts without verified emails are skipped.
 - Failed companies do not crash the full pipeline.
 - Logs include per-company contact counts and total contacts found.
 
 ---
 
-## Phase 5: Eazyreach Email Resolution
+## Phase 5: Verified Contact Filtering
 
 ### Goal
 
-Resolve verified work emails for discovered contacts.
+Prepare verified Prospeo contacts for personalization.
 
 ### Scope
 
-- Create `services/eazyreach_service.py`.
-- Query Eazyreach using each contact's LinkedIn URL.
-- Attach verified email addresses to contacts.
-- Skip empty or unverified email responses.
-- Log failures and skipped contacts.
+- Filter Prospeo contacts with missing LinkedIn URLs.
+- Filter Prospeo contacts with empty emails.
+- Filter Prospeo contacts with unverified emails.
+- Log skipped contacts and skip reasons.
 
 ### Deliverables
 
-- Verified contacts with email addresses populated.
+- Verified contacts with LinkedIn URLs and email addresses.
 
 ### Acceptance Criteria
 
 - Only verified emails move forward.
 - Contacts without emails are skipped safely.
-- Email resolution errors do not crash the pipeline.
 - Logs show total verified emails.
 
 ---
@@ -329,7 +327,7 @@ Harden the pipeline against provider failures, missing data, and runtime errors.
   - Apollo failure after retries stops the pipeline.
   - Prospeo failure skips the company.
   - Missing LinkedIn skips the contact.
-  - Missing or unverified email skips the contact.
+  - Missing or unverified Prospeo email skips the contact.
   - Brevo failure logs the recipient and continues.
 
 ### Deliverables
@@ -419,7 +417,6 @@ Prepare the application for real usage with credentials and live APIs.
 4. Provider integrations in this order:
    - Apollo.io
    - Prospeo
-   - Eazyreach
    - Brevo
 5. Retry and error handling hardening.
 6. Unit and mocked integration tests.
@@ -435,7 +432,7 @@ The CLI accepts a domain and runs through a fake pipeline from company discovery
 
 ### Milestone 2: Data Collection Complete
 
-Apollo.io, Prospeo, and Eazyreach are integrated and produce verified contacts.
+Apollo.io and Prospeo are integrated and produce verified contacts.
 
 ### Milestone 3: Send-Ready Workflow
 
@@ -467,7 +464,7 @@ The project is complete when:
 - `python main.py openai.com` triggers the full pipeline.
 - Similar companies are discovered.
 - Decision makers are found and filtered.
-- Verified work emails are resolved.
+- Verified work emails are retrieved through Prospeo.
 - Personalized outreach emails are generated.
 - The user must approve before sending.
 - Emails are sent through Brevo.

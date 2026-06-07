@@ -44,12 +44,6 @@ class ContactDiscoveryService:
         return []
 
 
-class EmailResolutionService:
-    def resolve_email(self, contact: Contact) -> Contact | None:
-        logger.info("Eazyreach integration pending for %s; skipping email resolution", contact.linkedin_url)
-        return None
-
-
 class EmailGenerator:
     def generate(self, contacts: Sequence[Contact]) -> list[EmailPayload]:
         logger.info("Email template generation pending; returning no payloads")
@@ -74,14 +68,12 @@ class Pipeline:
         *,
         company_discovery: CompanyDiscoveryService | None = None,
         contact_discovery: ContactDiscoveryService | None = None,
-        email_resolution: EmailResolutionService | None = None,
         email_generator: EmailGenerator | None = None,
         confirmation: ConfirmationService | None = None,
         email_sender: EmailSendingService | None = None,
     ) -> None:
         self.company_discovery = company_discovery or CompanyDiscoveryService()
         self.contact_discovery = contact_discovery or ContactDiscoveryService()
-        self.email_resolution = email_resolution or EmailResolutionService()
         self.email_generator = email_generator or EmailGenerator()
         self.confirmation = confirmation or ConfirmationService()
         self.email_sender = email_sender or EmailSendingService()
@@ -96,7 +88,7 @@ class Pipeline:
         contacts = self._find_contacts(companies)
         logger.info("Found %s contacts", len(contacts))
 
-        verified_contacts = self._resolve_emails(contacts)
+        verified_contacts = self._filter_verified_contacts(contacts)
         logger.info("Found %s verified emails", len(verified_contacts))
 
         email_payloads = self.email_generator.generate(verified_contacts)
@@ -143,17 +135,17 @@ class Pipeline:
                 logger.error("Failed contact discovery for %s: %s", company.domain, error)
         return contacts
 
-    def _resolve_emails(self, contacts: Iterable[Contact]) -> list[Contact]:
+    def _filter_verified_contacts(self, contacts: Iterable[Contact]) -> list[Contact]:
         verified_contacts: list[Contact] = []
         for contact in contacts:
             if not contact.linkedin_url:
                 logger.warning("Skipping contact without LinkedIn URL: %s", contact.name)
                 continue
-            try:
-                resolved_contact = self.email_resolution.resolve_email(contact)
-            except Exception as error:
-                logger.error("Failed email resolution for %s: %s", contact.linkedin_url, error)
+            if not contact.email:
+                logger.warning("Skipping contact without email: %s", contact.name)
                 continue
-            if resolved_contact and resolved_contact.email:
-                verified_contacts.append(resolved_contact)
+            if not contact.email_verified:
+                logger.warning("Skipping contact with unverified email: %s", contact.email)
+                continue
+            verified_contacts.append(contact)
         return verified_contacts

@@ -7,3 +7,4 @@ class Contact:
     title: str
     linkedin_url: str
     email: str | None = None
+    email_verified: bool = False

@@ -24,7 +24,7 @@ Current expected behavior:
 
 - The domain is normalized and validated.
 - The Phase 2 orchestrator runs.
-- Apollo, Prospeo, Eazyreach, email generation, confirmation, and Brevo are still placeholder stages.
+- Apollo, Prospeo, email generation, confirmation, and Brevo are still placeholder stages.
 - The command returns a JSON pipeline summary with zero discovered/sent counts until later phases add real integrations.
 
 Example output:
@@ -92,6 +92,7 @@ Expected result: the pipeline runs through the placeholder orchestrator and retu
 - Service injection.
 - Contact discovery error handling.
 - Missing LinkedIn skip behavior.
+- Missing or unverified email skip behavior.
 - Confirmation default behavior blocks sending.
 
 ### Test File

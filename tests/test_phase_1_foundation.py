@@ -32,14 +32,12 @@ def test_config_loads_without_requiring_keys(monkeypatch: pytest.MonkeyPatch) ->
     for env_name in (
         "APOLLO_API_KEY",
         "PROSPEO_API_KEY",
-        "EAZYREACH_API_KEY",
         "BREVO_API_KEY",
     ):
         monkeypatch.delenv(env_name, raising=False)
 
-    config = AppConfig.from_env()
+    config = AppConfig.from_env(load_env_file=False)
 
     assert config.apollo_api_key is None
     assert config.prospeo_api_key is None
-    assert config.eazyreach_api_key is None
     assert config.brevo_api_key is None
